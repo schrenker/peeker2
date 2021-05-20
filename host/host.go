@@ -56,9 +56,31 @@ func parseYAMLConfig() *yamlConfig {
 	return &cfg
 }
 
-func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) { return nil, nil }
+func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
+	if keyPath == "no" {
+		return &ssh.ClientConfig{
+			User:            user,
+			Auth:            []ssh.AuthMethod{},
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}, nil
+	}
 
-// func parseHost(services []string) {}
+	key, err := os.ReadFile(keyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	signer, err := ssh.ParsePrivateKey(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ssh.ClientConfig{
+		User:            user,
+		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}, nil
+}
 
 func GetHosts() []*Host {
 	yamlFile := parseYAMLConfig()
