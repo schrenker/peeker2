@@ -8,28 +8,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	LOAD = iota
-	MEM
-	ROOTFS
-	HOMEFS
-	VARFS
-	EXIM
-	//more stats and services
-)
-
 type Host struct {
-	hostname string
-	port     string
+	Hostname string
+	IP       string
+	Port     string
 
-	cfg *ssh.ClientConfig
+	Cfg *ssh.ClientConfig
 
-	services []int
+	Services []string
+
+	Cmd   string
+	State map[string]string
 }
 
 type yamlConfig struct {
 	yamlHosts []struct {
 		hostname string   `yaml:"hostname"`
+		ip       string   `yaml:"ip"`
 		port     string   `yaml:"port"`
 		user     string   `yaml:"user"`
 		keyPath  string   `yaml:"key"`
@@ -37,11 +32,24 @@ type yamlConfig struct {
 	} `yaml:"hosts"`
 }
 
-func parseYAMLConfig(...string) *yamlConfig {
-	yamlFile, err := os.ReadFile("./testdata/cfg.yaml")
-	if err != nil {
+func parseYAMLConfig() *yamlConfig {
+	paths := []string{"./testdata/cfg.yaml", "./cfg.yaml", os.Args[1]}
+	var yamlFile []byte
+	var err error
+
+	for i := range paths {
+		yamlFile, err = os.ReadFile(paths[i])
+		if yamlFile != nil {
+			break
+		} else {
+			continue
+		}
+	}
+
+	if yamlFile == nil {
 		log.Fatalln(err)
 	}
+
 	var cfg yamlConfig
 	err = yaml.Unmarshal(yamlFile, &cfg)
 	if err != nil {
@@ -52,4 +60,8 @@ func parseYAMLConfig(...string) *yamlConfig {
 
 // func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) { return nil, nil }
 
-// func GetHosts() ([]*Host, error) { return nil, nil }
+// func parseHost(services []string) {}
+
+// func GetHosts() ([]*Host, error) {
+// 	yaml := parseYAMLConfig()
+// }
