@@ -1,6 +1,7 @@
 package host
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -20,18 +21,18 @@ type Host struct {
 }
 
 type yamlConfig struct {
-	yamlHosts []struct {
-		hostname string   `yaml:"hostname"`
-		ip       string   `yaml:"ip"`
-		port     string   `yaml:"port"`
-		user     string   `yaml:"user"`
-		keyPath  string   `yaml:"key"`
-		services []string `yaml:"services"`
+	YamlHosts []struct {
+		Hostname string   `yaml:"hostname"`
+		Ip       string   `yaml:"ip"`
+		Port     string   `yaml:"port"`
+		User     string   `yaml:"user"`
+		KeyPath  string   `yaml:"key"`
+		Services []string `yaml:"services"`
 	} `yaml:"hosts"`
 }
 
 func parseYAMLConfig() *yamlConfig {
-	paths := []string{"./testdata/cfg.yaml", "./cfg.yaml", os.Args[1]}
+	paths := []string{"./testdata/cfg.yaml", "./cfg.yaml"}
 	var yamlFile []byte
 	var err error
 
@@ -82,23 +83,28 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
+// func commandBuilder(services []string) []string
+
 func GetHosts() []*Host {
 	yamlFile := parseYAMLConfig()
 
-	ret := make([]*Host, len(yamlFile.yamlHosts))
+	ret := make([]*Host, len(yamlFile.YamlHosts))
 
-	for i := range yamlFile.yamlHosts {
-		sshcfg, err := prepareSSHConfig(yamlFile.yamlHosts[i].user, yamlFile.yamlHosts[i].keyPath)
+	for i := range yamlFile.YamlHosts {
+		sshcfg, err := prepareSSHConfig(yamlFile.YamlHosts[i].User, yamlFile.YamlHosts[i].KeyPath)
+		fmt.Println(sshcfg)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		ret[i] = &Host{
-			Hostname: yamlFile.yamlHosts[i].hostname,
-			IP:       yamlFile.yamlHosts[i].ip,
-			Port:     yamlFile.yamlHosts[i].port,
-			Services: yamlFile.yamlHosts[i].services,
+			Hostname: yamlFile.YamlHosts[i].Hostname,
+			IP:       yamlFile.YamlHosts[i].Ip,
+			Port:     yamlFile.YamlHosts[i].Port,
+			Services: yamlFile.YamlHosts[i].Services,
 			Cfg:      sshcfg,
+
+			State: make(map[string]string),
 		}
 	}
 
