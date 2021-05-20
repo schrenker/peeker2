@@ -4,20 +4,47 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/yaml.v2"
 )
 
+type ServiceIndex []string
+
+func serviceIndexBuilder(hosts yamlConfig) ServiceIndex {
+	var ret ServiceIndex
+	amounts := make(map[string]int)
+
+	for i := range hosts.YamlHosts {
+		for j := range hosts.YamlHosts[i].Services {
+			amounts[hosts.YamlHosts[i].Services[j]]++
+		}
+	}
+
+	tmp := make([]string, 0, len(amounts))
+	for i := range amounts {
+		tmp = append(tmp, i)
+	}
+	sort.Slice(tmp, func(i, j int) bool {
+		return amounts[tmp[i]] > amounts[tmp[j]]
+	})
+
+	for i := range tmp {
+		ret = append(ret, tmp[i])
+	}
+
+	return ret
+}
+
 type Host struct {
 	Hostname string
 	IP       string
 	Port     string
+	Cmd      string
 	Cfg      *ssh.ClientConfig
 	Services []string
-
-	Cmd   string
-	State map[string]string
+	State    map[string]string
 }
 
 type yamlConfig struct {
@@ -85,8 +112,10 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 
 // func commandBuilder(services []string) []string
 
-func GetHosts() []*Host {
+func GetHosts() ([]*Host, ServiceIndex) {
 	yamlFile := parseYAMLConfig()
+
+	serviceIndex := serviceIndexBuilder(*yamlFile)
 
 	ret := make([]*Host, len(yamlFile.YamlHosts))
 
@@ -108,5 +137,5 @@ func GetHosts() []*Host {
 		}
 	}
 
-	return ret
+	return ret, serviceIndex
 }
