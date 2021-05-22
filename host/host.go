@@ -1,6 +1,7 @@
 package host
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -45,7 +46,25 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 }
 
 func commandBuilder(services []string, serviceIndex config.ServiceIndex) string {
-	return ""
+	cmd := ""
+	for i := range serviceIndex {
+		if stringInSlice(serviceIndex[i], services) {
+			cmd += fmt.Sprintf("systemctl is-active %v;", serviceIndex[i])
+		} else {
+			cmd += "echo;"
+		}
+	}
+	cmd += "cat /proc/loadavg | awk '{$1 $2 $3}';"
+	return cmd
+}
+
+func stringInSlice(str string, slice []string) bool {
+	for i := range slice {
+		if str == slice[i] {
+			return true
+		}
+	}
+	return false
 }
 
 func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host {
