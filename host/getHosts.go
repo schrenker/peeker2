@@ -35,7 +35,7 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
-func commandBuilder(services []string, serviceIndex config.Index, disks []string, diskIndex config.Index) string {
+func commandBuilder(disks, services []string, diskIndex, serviceIndex config.Index) string {
 	cmd := "cat /proc/loadavg | awk '{print $1\" \"$2\" \"$3}';"
 	for i := range diskIndex {
 		if stringInSlice(diskIndex[i], disks) {
@@ -79,10 +79,10 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 			Services: yamlFile.Hosts[i].Services,
 			Disks:    yamlFile.Hosts[i].Disks,
 			Cmd: commandBuilder(
-				yamlFile.Hosts[i].Services,
-				globalCfg.ServiceIndex,
 				yamlFile.Hosts[i].Disks,
+				yamlFile.Hosts[i].Services,
 				globalCfg.DiskIndex,
+				globalCfg.ServiceIndex,
 			),
 			Cfg:   sshcfg,
 			State: make(map[string]string),

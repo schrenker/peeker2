@@ -2,7 +2,9 @@ package host
 
 import (
 	"bytes"
+	"strings"
 
+	"github.com/schrenker/peeker2/config"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -12,8 +14,8 @@ type Host struct {
 	Port     string
 	Cmd      string
 	Cfg      *ssh.ClientConfig
-	Services []string
 	Disks    []string
+	Services []string
 	State    map[string]string
 }
 
@@ -35,4 +37,10 @@ func (h Host) ExecuteCmd() ([]byte, error) {
 	session.Run(h.Cmd)
 
 	return stdoutBuf.Bytes(), nil
+}
+
+func (h *Host) OutToState(out []byte, disks, services config.Index) {
+	tmp := strings.Split(string(out), "\n")
+	h.State["load"] = tmp[0]
+
 }
