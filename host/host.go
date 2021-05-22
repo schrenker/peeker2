@@ -16,6 +16,7 @@ type Host struct {
 	Cmd      string
 	Cfg      *ssh.ClientConfig
 	Services []string
+	Disks    []string
 	State    map[string]string
 }
 
@@ -45,7 +46,7 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
-func commandBuilder(services []string, serviceIndex config.ServiceIndex) string {
+func commandBuilder(services []string, serviceIndex config.Index, diskIndex config.Index) string {
 	cmd := ""
 	for i := range serviceIndex {
 		if stringInSlice(serviceIndex[i], services) {
@@ -81,7 +82,8 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 			IP:       yamlFile.YamlHosts[i].Ip,
 			Port:     yamlFile.YamlHosts[i].Port,
 			Services: yamlFile.YamlHosts[i].Services,
-			Cmd:      commandBuilder(yamlFile.YamlHosts[i].Services, globalCfg.ServiceIndex),
+			Disks:    yamlFile.YamlHosts[i].Disks,
+			Cmd:      commandBuilder(yamlFile.YamlHosts[i].Services, globalCfg.ServiceIndex, globalCfg.DiskIndex),
 			Cfg:      sshcfg,
 			State:    make(map[string]string),
 		}
