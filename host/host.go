@@ -19,7 +19,7 @@ type Host struct {
 	State    map[string]string
 }
 
-func (h Host) ExecuteCmd() ([]byte, error) {
+func (h Host) executeCmd() ([]byte, error) {
 	client, err := ssh.Dial("tcp", h.Hostname+":"+h.Port, h.Cfg)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (h Host) ExecuteCmd() ([]byte, error) {
 	return stdoutBuf.Bytes(), nil
 }
 
-func (h *Host) OutToState(out []byte, disks, services config.Index) {
+func (h *Host) outToState(out []byte, disks, services config.Index) {
 	tmp := strings.Split(string(out), "\n")
 	h.State["load"] = tmp[0]
 	field := 1
@@ -52,4 +52,12 @@ func (h *Host) OutToState(out []byte, disks, services config.Index) {
 		h.State[services[i]] = tmp[field]
 		field++
 	}
+}
+
+func (h *Host) UpdateState(disks, services config.Index) {
+	out, err := h.executeCmd()
+	if err != nil {
+		return
+	}
+	h.outToState(out, disks, services)
 }
