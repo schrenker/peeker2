@@ -64,24 +64,24 @@ func stringInSlice(str string, slice []string) bool {
 }
 
 func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host {
-	ret := make([]*Host, len(yamlFile.YamlHosts))
+	ret := make([]*Host, len(yamlFile.Hosts))
 
-	for i := range yamlFile.YamlHosts {
-		sshcfg, err := prepareSSHConfig(yamlFile.YamlHosts[i].User, yamlFile.YamlHosts[i].KeyPath)
+	for i := range yamlFile.Hosts {
+		sshcfg, err := prepareSSHConfig(yamlFile.Hosts[i].User, yamlFile.Hosts[i].KeyPath)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		ret[i] = &Host{
-			Hostname: yamlFile.YamlHosts[i].Hostname,
-			IP:       yamlFile.YamlHosts[i].Ip,
-			Port:     yamlFile.YamlHosts[i].Port,
-			Services: yamlFile.YamlHosts[i].Services,
-			Disks:    yamlFile.YamlHosts[i].Disks,
+			Hostname: yamlFile.Hosts[i].Hostname,
+			IP:       yamlFile.Hosts[i].Ip,
+			Port:     yamlFile.Hosts[i].Port,
+			Services: yamlFile.Hosts[i].Services,
+			Disks:    yamlFile.Hosts[i].Disks,
 			Cmd: commandBuilder(
-				yamlFile.YamlHosts[i].Services,
+				yamlFile.Hosts[i].Services,
 				globalCfg.ServiceIndex,
-				yamlFile.YamlHosts[i].Disks,
+				yamlFile.Hosts[i].Disks,
 				globalCfg.DiskIndex,
 			),
 			Cfg:   sshcfg,
