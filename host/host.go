@@ -1,7 +1,6 @@
 package host
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -10,9 +9,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type GlobalConfig struct {
+	ServiceIndex ServiceIndex
+	Interval     int
+}
+
+func newGlobalConfig(srv ServiceIndex, interval int) *GlobalConfig {
+	return &GlobalConfig{
+		ServiceIndex: srv,
+		Interval:     interval,
+	}
+}
+
 type ServiceIndex []string
 
-func serviceIndexBuilder(hosts yamlConfig) ServiceIndex {
+func newServiceIndex(hosts yamlConfig) ServiceIndex {
 	var ret ServiceIndex
 	amounts := make(map[string]int)
 
@@ -48,6 +59,7 @@ type Host struct {
 }
 
 type yamlConfig struct {
+	Interval  int `yaml:"interval"`
 	YamlHosts []struct {
 		Hostname string   `yaml:"hostname"`
 		Ip       string   `yaml:"ip"`
@@ -85,7 +97,7 @@ func parseYAMLConfig() *yamlConfig {
 }
 
 func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
-	if keyPath == "no" {
+	if keyPath == "" {
 		return &ssh.ClientConfig{
 			User:            user,
 			Auth:            []ssh.AuthMethod{},
@@ -110,18 +122,19 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
-// func commandBuilder(services []string) []string
+func commandBuilder(services []string, serviceIndex ServiceIndex) string {
+	return ""
+}
 
-func GetHosts() ([]*Host, ServiceIndex) {
+func GetHosts() ([]*Host, *GlobalConfig) {
 	yamlFile := parseYAMLConfig()
-
-	serviceIndex := serviceIndexBuilder(*yamlFile)
+	srv := newServiceIndex(*yamlFile)
+	globalCfg := newGlobalConfig(srv, yamlFile.Interval)
 
 	ret := make([]*Host, len(yamlFile.YamlHosts))
 
 	for i := range yamlFile.YamlHosts {
 		sshcfg, err := prepareSSHConfig(yamlFile.YamlHosts[i].User, yamlFile.YamlHosts[i].KeyPath)
-		fmt.Println(sshcfg)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -131,11 +144,11 @@ func GetHosts() ([]*Host, ServiceIndex) {
 			IP:       yamlFile.YamlHosts[i].Ip,
 			Port:     yamlFile.YamlHosts[i].Port,
 			Services: yamlFile.YamlHosts[i].Services,
+			Cmd:      commandBuilder(yamlFile.YamlHosts[i].Services, globalCfg.ServiceIndex),
 			Cfg:      sshcfg,
-
-			State: make(map[string]string),
+			State:    make(map[string]string),
 		}
 	}
 
-	return ret, serviceIndex
+	return ret, globalCfg
 }
