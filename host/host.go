@@ -47,7 +47,7 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 }
 
 func commandBuilder(services []string, serviceIndex config.Index, disks []string, diskIndex config.Index) string {
-	cmd := "cat /proc/loadavg | awk '{$1 $2 $3}';"
+	cmd := "cat /proc/loadavg | awk '{print $1\" \"$2\" \"$3}';"
 	for i := range diskIndex {
 		if stringInSlice(diskIndex[i], disks) {
 			cmd += fmt.Sprintf("df -hBG | grep -w %v;", diskIndex[i])
