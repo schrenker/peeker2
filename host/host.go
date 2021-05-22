@@ -46,8 +46,15 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
-func commandBuilder(services []string, serviceIndex config.Index, diskIndex config.Index) string {
-	cmd := ""
+func commandBuilder(services []string, serviceIndex config.Index, disks []string, diskIndex config.Index) string {
+	cmd := "cat /proc/loadavg | awk '{$1 $2 $3}';"
+	for i := range diskIndex {
+		if stringInSlice(diskIndex[i], disks) {
+			cmd += fmt.Sprintf("df -hBG | grep -w %v;", diskIndex[i])
+		} else {
+			cmd += "echo;"
+		}
+	}
 	for i := range serviceIndex {
 		if stringInSlice(serviceIndex[i], services) {
 			cmd += fmt.Sprintf("systemctl is-active %v;", serviceIndex[i])
@@ -55,7 +62,6 @@ func commandBuilder(services []string, serviceIndex config.Index, diskIndex conf
 			cmd += "echo;"
 		}
 	}
-	cmd += "cat /proc/loadavg | awk '{$1 $2 $3}';"
 	return cmd
 }
 
@@ -83,9 +89,14 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 			Port:     yamlFile.YamlHosts[i].Port,
 			Services: yamlFile.YamlHosts[i].Services,
 			Disks:    yamlFile.YamlHosts[i].Disks,
-			Cmd:      commandBuilder(yamlFile.YamlHosts[i].Services, globalCfg.ServiceIndex, globalCfg.DiskIndex),
-			Cfg:      sshcfg,
-			State:    make(map[string]string),
+			Cmd: commandBuilder(
+				yamlFile.YamlHosts[i].Services,
+				globalCfg.ServiceIndex,
+				yamlFile.YamlHosts[i].Disks,
+				globalCfg.DiskIndex,
+			),
+			Cfg:   sshcfg,
+			State: make(map[string]string),
 		}
 	}
 
