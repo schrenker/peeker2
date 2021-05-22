@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/schrenker/peeker2/config"
 	"golang.org/x/crypto/ssh"
@@ -93,7 +94,12 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 }
 
 func UpdateStatusAll(hosts []*Host, disks, services config.Index) {
+	var wg sync.WaitGroup
+
 	for i := range hosts {
-		hosts[i].updateState(disks, services)
+		wg.Add(1)
+		go hosts[i].updateState(disks, services, &wg)
 	}
+
+	wg.Wait()
 }

@@ -3,6 +3,7 @@ package host
 import (
 	"bytes"
 	"strings"
+	"sync"
 
 	"github.com/schrenker/peeker2/config"
 	"golang.org/x/crypto/ssh"
@@ -54,7 +55,8 @@ func (h *Host) outToState(out []byte, disks, services config.Index) {
 	}
 }
 
-func (h *Host) updateState(disks, services config.Index) {
+func (h *Host) updateState(disks, services config.Index, wg *sync.WaitGroup) {
+	defer wg.Done()
 	out, err := h.executeCmd()
 	if err != nil {
 		return
