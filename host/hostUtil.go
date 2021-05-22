@@ -91,3 +91,9 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 
 	return ret
 }
+
+func UpdateStatusAll(hosts []*Host, disks, services config.Index) {
+	for i := range hosts {
+		hosts[i].updateState(disks, services)
+	}
+}

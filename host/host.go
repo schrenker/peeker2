@@ -54,7 +54,7 @@ func (h *Host) outToState(out []byte, disks, services config.Index) {
 	}
 }
 
-func (h *Host) UpdateState(disks, services config.Index) {
+func (h *Host) updateState(disks, services config.Index) {
 	out, err := h.executeCmd()
 	if err != nil {
 		return
