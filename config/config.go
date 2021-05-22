@@ -14,7 +14,7 @@ type GlobalConfig struct {
 	Interval     int
 }
 
-func newGlobalConfig(srv Index, disk Index, interval int) *GlobalConfig {
+func newGlobalConfig(disk, srv Index, interval int) *GlobalConfig {
 	return &GlobalConfig{
 		ServiceIndex: srv,
 		DiskIndex:    disk,
@@ -64,8 +64,8 @@ type YamlConfig struct {
 		Port     string   `yaml:"port"`
 		User     string   `yaml:"user"`
 		KeyPath  string   `yaml:"key"`
-		Services []string `yaml:"services"`
 		Disks    []string `yaml:"disks"`
+		Services []string `yaml:"services"`
 	} `yaml:"hosts"`
 }
 
@@ -102,8 +102,8 @@ func parseYAMLConfig() *YamlConfig {
 
 func GetConfig() (*YamlConfig, *GlobalConfig) {
 	yamlFile := parseYAMLConfig()
-	srv := newIndex(*yamlFile, "service")
 	disk := newIndex(*yamlFile, "disk")
-	globalCfg := newGlobalConfig(srv, disk, yamlFile.Interval)
+	srv := newIndex(*yamlFile, "service")
+	globalCfg := newGlobalConfig(disk, srv, yamlFile.Interval)
 	return yamlFile, globalCfg
 }
