@@ -28,15 +28,13 @@ func newIndex(hosts YamlConfig, indexType string) Index {
 	var ret Index
 	amounts := make(map[string]int)
 
-	switch indexType {
-	case "service":
-		for i := range hosts.Hosts {
+	for i := range hosts.Hosts {
+		switch indexType {
+		case "service":
 			for j := range hosts.Hosts[i].Services {
 				amounts[hosts.Hosts[i].Services[j]]++
 			}
-		}
-	case "disk":
-		for i := range hosts.Hosts {
+		case "disk":
 			for j := range hosts.Hosts[i].Disks {
 				amounts[hosts.Hosts[i].Disks[j]]++
 			}
