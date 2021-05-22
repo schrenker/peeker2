@@ -40,7 +40,7 @@ func commandBuilder(disks, services []string, diskIndex, serviceIndex config.Ind
 	cmd := "cat /proc/loadavg | awk '{print $1\" \"$2\" \"$3}';"
 	for i := range diskIndex {
 		if stringInSlice(diskIndex[i], disks) {
-			cmd += fmt.Sprintf("df -hBG | grep -w %v;", diskIndex[i])
+			cmd += fmt.Sprintf("df -hBG | grep -w %v | awk '{print $4\" \"$5}';", diskIndex[i])
 		} else {
 			cmd += "echo;"
 		}

@@ -2,6 +2,8 @@ package host
 
 import (
 	"bytes"
+	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -21,7 +23,11 @@ type Host struct {
 }
 
 func (h Host) executeCmd() ([]byte, error) {
-	client, err := ssh.Dial("tcp", h.Hostname+":"+h.Port, h.Cfg)
+	addr := h.Hostname
+	if h.IP != "" {
+		addr = h.IP
+	}
+	client, err := ssh.Dial("tcp", addr+":"+h.Port, h.Cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +52,14 @@ func (h *Host) outToState(out []byte, disks, services config.Index) {
 	field := 1
 
 	for i := range disks {
-		h.State[disks[i]] = tmp[field]
+		if tmp[field] != "" {
+			spl := strings.Split(tmp[field], " ")
+			atoi, _ := strconv.Atoi(spl[1][:len(spl[1])-1])
+			spl[1] = strconv.Itoa(100 - atoi)
+			h.State[disks[i]] = fmt.Sprintf("%v (%v%%)", spl[0], spl[1])
+		} else {
+			h.State[disks[i]] = tmp[field]
+		}
 		field++
 	}
 	for i := range services {
