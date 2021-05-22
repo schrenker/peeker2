@@ -9,26 +9,37 @@ import (
 )
 
 type GlobalConfig struct {
-	ServiceIndex ServiceIndex
+	ServiceIndex Index
+	DiskIndex    Index
 	Interval     int
 }
 
-func newGlobalConfig(srv ServiceIndex, interval int) *GlobalConfig {
+func newGlobalConfig(srv Index, disk Index, interval int) *GlobalConfig {
 	return &GlobalConfig{
 		ServiceIndex: srv,
+		DiskIndex:    disk,
 		Interval:     interval,
 	}
 }
 
-type ServiceIndex []string
+type Index []string
 
-func newServiceIndex(hosts YamlConfig) ServiceIndex {
-	var ret ServiceIndex
+func newIndex(hosts YamlConfig, indexType string) Index {
+	var ret Index
 	amounts := make(map[string]int)
 
-	for i := range hosts.YamlHosts {
-		for j := range hosts.YamlHosts[i].Services {
-			amounts[hosts.YamlHosts[i].Services[j]]++
+	switch indexType {
+	case "service":
+		for i := range hosts.YamlHosts {
+			for j := range hosts.YamlHosts[i].Services {
+				amounts[hosts.YamlHosts[i].Services[j]]++
+			}
+		}
+	case "disk":
+		for i := range hosts.YamlHosts {
+			for j := range hosts.YamlHosts[i].Disks {
+				amounts[hosts.YamlHosts[i].Disks[j]]++
+			}
 		}
 	}
 
@@ -56,6 +67,7 @@ type YamlConfig struct {
 		User     string   `yaml:"user"`
 		KeyPath  string   `yaml:"key"`
 		Services []string `yaml:"services"`
+		Disks    []string `yaml:"disks"`
 	} `yaml:"hosts"`
 }
 
@@ -87,7 +99,8 @@ func parseYAMLConfig() *YamlConfig {
 
 func GetConfig() (*YamlConfig, *GlobalConfig) {
 	yamlFile := parseYAMLConfig()
-	srv := newServiceIndex(*yamlFile)
-	globalCfg := newGlobalConfig(srv, yamlFile.Interval)
+	srv := newIndex(*yamlFile, "service")
+	disk := newIndex(*yamlFile, "disk")
+	globalCfg := newGlobalConfig(srv, disk, yamlFile.Interval)
 	return yamlFile, globalCfg
 }
