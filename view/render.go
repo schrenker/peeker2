@@ -28,6 +28,7 @@ func Render(hosts []*host.Host, globalCfg config.GlobalConfig) {
 
 	for {
 		view := newView(hosts, banner)
+		view.padding(hosts, banner)
 		view.display()
 		time.Sleep(time.Duration(globalCfg.Interval) * time.Second)
 	}

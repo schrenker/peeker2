@@ -18,6 +18,23 @@ func (v view) display() {
 	tm.Flush()
 }
 
+func (v view) padding(hosts []*host.Host, banner []string) {
+	for i := range banner {
+		max := len(banner[i])
+
+		for j := range hosts {
+			ln := len(hosts[j].State[banner[i]])
+			if ln > max {
+				max = ln
+			}
+		}
+
+		for k := range v {
+			v[k][i] = v[k][i] + strings.Repeat(" ", max-len(v[k][i]))
+		}
+	}
+}
+
 func newView(hosts []*host.Host, banner []string) view {
 	ret := make(view, len(hosts)+1)
 
@@ -35,4 +52,3 @@ func newView(hosts []*host.Host, banner []string) view {
 }
 
 // func colorize(row []string) {}
-// func padding(view [][]string) {}
