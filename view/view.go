@@ -13,7 +13,7 @@ func (v view) display() {
 	tm.Clear()
 	tm.MoveCursor(1, 1)
 	for i := range v {
-		tm.Println(strings.Join(v[i], " "))
+		tm.Println(strings.Join(v[i], "  "))
 	}
 	tm.Flush()
 }
@@ -23,9 +23,14 @@ func (v view) padding(hosts []*host.Host, banner []string) {
 		max := len(banner[i])
 
 		for j := range hosts {
-			ln := len(hosts[j].State[banner[i]])
-			if ln > max {
-				max = ln
+			if i == 0 {
+				if len(hosts[j].Hostname) > max {
+					max = len(hosts[j].Hostname)
+				}
+			} else {
+				if len(hosts[j].State[banner[i]]) > max {
+					max = len(hosts[j].State[banner[i]])
+				}
 			}
 		}
 
@@ -42,7 +47,8 @@ func newView(hosts []*host.Host, banner []string) view {
 
 	for i := range hosts {
 		tmp := make([]string, len(banner))
-		for j := range banner {
+		tmp[0] = hosts[i].Hostname
+		for j := 1; j < len(banner); j++ {
 			tmp[j] = hosts[i].State[banner[j]]
 		}
 		ret[i+1] = tmp

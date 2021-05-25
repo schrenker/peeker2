@@ -8,9 +8,10 @@ import (
 )
 
 func generateBanner(disks, services config.Index) []string {
-	banner := make([]string, 3+len(disks)+len(services))
-	banner[0] = "load"
-	ind := 1
+	banner := make([]string, 2+len(disks)+len(services))
+	banner[0] = "hostname"
+	banner[1] = "load"
+	ind := 2
 	for i := 0; i < len(disks); i++ {
 		banner[ind] = disks[i]
 		ind++
