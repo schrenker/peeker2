@@ -23,15 +23,19 @@ func (v view) padding(hosts []*host.Host, banner []string) {
 		max := len(banner[i])
 
 		for j := range hosts {
-			if i == 0 {
-				if len(hosts[j].Hostname) > max {
-					max = len(hosts[j].Hostname)
-				}
-			} else {
-				if len(hosts[j].State[banner[i]]) > max {
-					max = len(hosts[j].State[banner[i]])
-				}
+			ln := len(hosts[j].State[banner[i]])
+			if ln > max {
+				max = ln
 			}
+			// if i == 0 {
+			// 	if len(hosts[j].Hostname) > max {
+			// 		max = len(hosts[j].Hostname)
+			// 	}
+			// } else {
+			// 	if len(hosts[j].State[banner[i]]) > max {
+			// 		max = len(hosts[j].State[banner[i]])
+			// 	}
+			// }
 		}
 
 		for k := range v {
@@ -47,8 +51,9 @@ func newView(hosts []*host.Host, banner []string) view {
 
 	for i := range hosts {
 		tmp := make([]string, len(banner))
-		tmp[0] = hosts[i].Hostname
-		for j := 1; j < len(banner); j++ {
+		// tmp[0] = hosts[i].Hostname
+		// for j := 1; j < len(banner); j++ {
+		for j := range banner {
 			tmp[j] = hosts[i].State[banner[j]]
 		}
 		ret[i+1] = tmp

@@ -49,6 +49,7 @@ func (h Host) executeCmd() ([]byte, error) {
 func (h *Host) outToState(out []byte, disks, services config.Index) {
 	tmp := strings.Split(string(out), "\n")
 	h.State["load"] = tmp[0]
+	h.State["hostname"] = h.Hostname //REASON: easier to generate view later, cuts code by 10 lines
 	field := 1
 
 	for i := range disks {
