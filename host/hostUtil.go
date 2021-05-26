@@ -1,14 +1,18 @@
 package host
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/schrenker/peeker2/config"
 	"golang.org/x/crypto/ssh"
 )
+
+var Embedded embed.FS
 
 func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	if keyPath == "" {
@@ -19,9 +23,19 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 		}, nil
 	}
 
-	key, err := os.ReadFile(keyPath)
-	if err != nil {
-		return nil, err
+	var key []byte
+	var err error
+
+	if strings.Contains(keyPath, "embed") {
+		key, err = Embedded.ReadFile(keyPath)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		key, err = os.ReadFile(keyPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	signer, err := ssh.ParsePrivateKey(key)
