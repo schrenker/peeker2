@@ -1,12 +1,17 @@
 package config
 
 import (
+	"embed"
 	"log"
 	"os"
 	"sort"
 
+	_ "embed"
+
 	"gopkg.in/yaml.v2"
 )
+
+var Embedded embed.FS
 
 type GlobalConfig struct {
 	ServiceIndex Index
@@ -79,12 +84,16 @@ func parseYAMLConfig() *YamlConfig {
 	var yamlFile []byte
 	var err error
 
-	for i := range paths {
-		yamlFile, err = os.ReadFile(paths[i])
-		if yamlFile != nil {
-			break
-		} else {
-			continue
+	if data, err := Embedded.ReadFile("embed/cfg.yaml"); err == nil {
+		yamlFile = data
+	} else {
+		for i := range paths {
+			yamlFile, err = os.ReadFile(paths[i])
+			if yamlFile != nil {
+				break
+			} else {
+				continue
+			}
 		}
 	}
 
