@@ -6,8 +6,6 @@ import (
 	"os"
 	"sort"
 
-	_ "embed"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -21,8 +19,8 @@ type GlobalConfig struct {
 
 func newGlobalConfig(disk, srv Index, interval int) *GlobalConfig {
 	return &GlobalConfig{
-		ServiceIndex: srv,
 		DiskIndex:    disk,
+		ServiceIndex: srv,
 		Interval:     interval,
 	}
 }
@@ -84,9 +82,7 @@ func parseYAMLConfig() *YamlConfig {
 	var yamlFile []byte
 	var err error
 
-	if data, err := Embedded.ReadFile("embed/cfg.yaml"); err == nil {
-		yamlFile = data
-	} else {
+	if yamlFile, err = Embedded.ReadFile("embed/cfg.yaml"); err != nil {
 		for i := range paths {
 			yamlFile, err = os.ReadFile(paths[i])
 			if yamlFile != nil {
