@@ -8,7 +8,9 @@ type Observable interface {
 type DiskSlice []Disk
 
 type Disk struct {
-	Path string `yaml:"path"`
+	Path     string `yaml:"path"`
+	Warning  string `yaml:"warning"`
+	Critical string `yaml:"critical"`
 }
 
 func (d DiskSlice) GetNames() []string {
@@ -20,7 +22,11 @@ func (d DiskSlice) GetNames() []string {
 }
 
 func (d DiskSlice) GetInitialState() map[string]string {
-	tmp := make(map[string]string, 0)
+	tmp := make(map[string]string, 2)
+	for i := range d {
+		tmp[d[i].Path+"_warning"] = d[i].Warning
+		tmp[d[i].Path+"_critical"] = d[i].Critical
+	}
 	return tmp
 }
 
@@ -39,6 +45,6 @@ func (s ServiceSlice) GetNames() []string {
 }
 
 func (s ServiceSlice) GetInitialState() map[string]string {
-	tmp := make(map[string]string, 0)
+	tmp := make(map[string]string)
 	return tmp
 }
