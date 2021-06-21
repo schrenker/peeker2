@@ -2,6 +2,7 @@ package config
 
 type Observable interface {
 	GetNames() []string
+	GetInitialState() map[string]string
 }
 
 type DiskSlice []Disk
@@ -18,6 +19,11 @@ func (d DiskSlice) GetNames() []string {
 	return tmp
 }
 
+func (d DiskSlice) GetInitialState() map[string]string {
+	tmp := make(map[string]string, 0)
+	return tmp
+}
+
 type ServiceSlice []Service
 
 type Service struct {
@@ -29,5 +35,10 @@ func (s ServiceSlice) GetNames() []string {
 	for i := range s {
 		tmp[i] = s[i].Name
 	}
+	return tmp
+}
+
+func (s ServiceSlice) GetInitialState() map[string]string {
+	tmp := make(map[string]string, 0)
 	return tmp
 }

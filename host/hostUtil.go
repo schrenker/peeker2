@@ -50,17 +50,17 @@ func prepareSSHConfig(user, keyPath string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
-func commandBuilder(disks, services []string, diskIndex, serviceIndex config.Index) string {
+func commandBuilder(disks, services config.Observable, diskIndex, serviceIndex config.Index) string {
 	cmd := "cat /proc/loadavg | awk '{print $1\" \"$2\" \"$3}';"
 	for i := range diskIndex {
-		if stringInSlice(diskIndex[i], disks) {
+		if stringInSlice(diskIndex[i], disks.GetNames()) {
 			cmd += fmt.Sprintf("df -hBG | grep -w %v | awk '{print $4\" \"$5}';", diskIndex[i])
 		} else {
 			cmd += "echo;"
 		}
 	}
 	for i := range serviceIndex {
-		if stringInSlice(serviceIndex[i], services) {
+		if stringInSlice(serviceIndex[i], services.GetNames()) {
 			cmd += fmt.Sprintf("systemctl is-active %v;", serviceIndex[i])
 		} else {
 			cmd += "echo;"
@@ -102,6 +102,7 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 			Cfg:   sshcfg,
 			State: make(map[string]string),
 		}
+		ret[i].initialState()
 	}
 
 	return ret
