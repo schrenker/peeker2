@@ -17,8 +17,8 @@ type Host struct {
 	Port     string
 	Cmd      string
 	Cfg      *ssh.ClientConfig
-	Disks    []string
-	Services []string
+	Disks    config.DiskSlice
+	Services config.ServiceSlice
 	State    map[string]string
 }
 
@@ -46,10 +46,19 @@ func (h Host) executeCmd() ([]byte, error) {
 	return stdoutBuf.Bytes(), nil
 }
 
+func (h *Host) initialState() {
+	h.State["hostname"] = h.Hostname
+	for k, v := range h.Disks.GetInitialState() {
+		h.State[k] = v
+	}
+	for k, v := range h.Services.GetInitialState() {
+		h.State[k] = v
+	}
+}
+
 func (h *Host) outToState(out []byte, disks, services config.Index) {
 	tmp := strings.Split(string(out), "\n")
 	h.State["load"] = tmp[0]
-	h.State["hostname"] = h.Hostname //REASON: easier to generate view later, cuts code by 10 lines
 	field := 1
 
 	for i := range disks {

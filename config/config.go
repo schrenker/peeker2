@@ -35,11 +35,11 @@ func newIndex(hosts YamlConfig, indexType string) Index {
 		switch indexType {
 		case "service":
 			for j := range hosts.Hosts[i].Services {
-				amounts[hosts.Hosts[i].Services[j]]++
+				amounts[hosts.Hosts[i].Services[j].Name]++
 			}
 		case "disk":
 			for j := range hosts.Hosts[i].Disks {
-				amounts[hosts.Hosts[i].Disks[j]]++
+				amounts[hosts.Hosts[i].Disks[j].Path]++
 			}
 		}
 	}
@@ -62,13 +62,13 @@ func newIndex(hosts YamlConfig, indexType string) Index {
 type YamlConfig struct {
 	Interval int `yaml:"interval"`
 	Hosts    []struct {
-		Hostname string   `yaml:"hostname"`
-		Ip       string   `yaml:"ip"`
-		Port     string   `yaml:"port"`
-		User     string   `yaml:"user"`
-		KeyPath  string   `yaml:"key"`
-		Disks    []string `yaml:"disks"`
-		Services []string `yaml:"services"`
+		Hostname string       `yaml:"hostname"`
+		Ip       string       `yaml:"ip"`
+		Port     string       `yaml:"port"`
+		User     string       `yaml:"user"`
+		KeyPath  string       `yaml:"key"`
+		Disks    DiskSlice    `yaml:"disks"`
+		Services ServiceSlice `yaml:"services"`
 	} `yaml:"hosts"`
 }
 
