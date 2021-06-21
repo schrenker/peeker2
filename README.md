@@ -35,13 +35,15 @@ hosts:
     user: root
     key: ./user/.ssh/id_rsa
     services:
-      - httpd
-      - mysqld
-      - php-fpm
+      - name: httpd
+      - name: mysqld
+      - name: php-fpm
     disks:
-      - /
-      - home
-      - /var/log
+      - path: /
+        warning: 5%
+      - name: /var/log
+        warning: 5%
+        critical: 1%
 ```
 
 Alternatively, you can embed config into programs binary, by putting cfg.yaml and all required keys to embed directory, and then compiling the program. In order to use embedded ssh keys, simply point them to embed path, like below:
@@ -55,9 +57,9 @@ hosts:
     user: ssh-user
     key: embed/id_rsa
     services:
-      - httpd
+      - name: httpd
     disks:
-      - /
+      - path: /
 ```
 
 ## What now?
