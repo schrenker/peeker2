@@ -2,7 +2,6 @@ package config
 
 type Observable interface {
 	GetNames() []string
-	GetType() string
 }
 
 type DiskSlice []Disk

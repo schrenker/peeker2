@@ -62,13 +62,13 @@ func newIndex(hosts YamlConfig, indexType string) Index {
 type YamlConfig struct {
 	Interval int `yaml:"interval"`
 	Hosts    []struct {
-		Hostname string    `yaml:"hostname"`
-		Ip       string    `yaml:"ip"`
-		Port     string    `yaml:"port"`
-		User     string    `yaml:"user"`
-		KeyPath  string    `yaml:"key"`
-		Disks    []Disk    `yaml:"disks"`
-		Services []Service `yaml:"services"`
+		Hostname string       `yaml:"hostname"`
+		Ip       string       `yaml:"ip"`
+		Port     string       `yaml:"port"`
+		User     string       `yaml:"user"`
+		KeyPath  string       `yaml:"key"`
+		Disks    DiskSlice    `yaml:"disks"`
+		Services ServiceSlice `yaml:"services"`
 	} `yaml:"hosts"`
 }
 
