@@ -41,7 +41,7 @@ hosts:
     disks:
       - path: /
         warning: 5%
-      - name: /var/log
+      - path: /var/log
         warning: 5%
         critical: 1%
 ```
