@@ -17,8 +17,8 @@ type Host struct {
 	Port     string
 	Cmd      string
 	Cfg      *ssh.ClientConfig
-	Disks    []string
-	Services []string
+	Disks    []config.Disk
+	Services []config.Service
 	State    map[string]string
 }
 

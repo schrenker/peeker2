@@ -27,14 +27,6 @@ func newGlobalConfig(disk, srv Index, interval int) *GlobalConfig {
 
 type Index []string
 
-type Disk struct {
-	Path string `yaml:"path"`
-}
-
-type Service struct {
-	Name string `yaml:"name"`
-}
-
 func newIndex(hosts YamlConfig, indexType string) Index {
 	var ret Index
 	amounts := make(map[string]int)
