@@ -24,17 +24,12 @@ func generateBanner(disks, services config.Index) []string {
 }
 
 func Render(hosts []*host.Host, globalCfg config.GlobalConfig) {
-	host.UpdateStatusAll(hosts, globalCfg.DiskIndex, globalCfg.ServiceIndex)
-	banner := generateBanner(globalCfg.DiskIndex, globalCfg.ServiceIndex)
-
 	for {
+		host.UpdateStatusAll(hosts, globalCfg.DiskIndex, globalCfg.ServiceIndex)
+		banner := generateBanner(globalCfg.DiskIndex, globalCfg.ServiceIndex)
 		view := newView(hosts, banner)
 		view.padding(hosts, banner)
 		view.display()
 		time.Sleep(time.Duration(globalCfg.Interval) * time.Second)
-		view = nil
-		host.UpdateStatusAll(hosts, globalCfg.DiskIndex, globalCfg.ServiceIndex)
-		banner = generateBanner(globalCfg.DiskIndex, globalCfg.ServiceIndex)
 	}
-
 }
