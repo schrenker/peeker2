@@ -45,6 +45,5 @@ func (s ServiceSlice) GetNames() []string {
 }
 
 func (s ServiceSlice) GetInitialState() map[string]string {
-	tmp := make(map[string]string)
-	return tmp
+	return nil
 }
