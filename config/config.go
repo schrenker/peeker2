@@ -74,12 +74,6 @@ type YamlConfig struct {
 }
 
 func parseYAMLConfig() *YamlConfig {
-	// paths := make([]string, 2, 3)
-	// if len(os.Args) > 1 {
-	// 	paths = append(paths, os.Args[1])
-	// }
-	// paths = append(paths, []string{"./testdata/cfg.yaml", "./cfg.yaml"}...)
-
 	paths := []string{ConfigFile, "./cfg.yaml", "./cfg.yml"}
 
 	var yamlFile []byte
@@ -88,7 +82,7 @@ func parseYAMLConfig() *YamlConfig {
 	if yamlFile, err = Embedded.ReadFile("embed/cfg.yaml"); err != nil {
 		if yamlFile, err = Embedded.ReadFile("embed/cfg.yml"); err != nil {
 			for i := range paths {
-				yamlFile, err = os.ReadFile(paths[i])
+				yamlFile, _ = os.ReadFile(paths[i])
 				if yamlFile != nil {
 					break
 				} else {
