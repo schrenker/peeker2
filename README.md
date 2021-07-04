@@ -14,11 +14,13 @@ I felt need for a very simple alternative to big blown-out monitoring tools, tha
 
 Based on yaml configuration provided, this tool makes parallel ssh calls to hosts, pulling necessary information and then displays it on terminal screen.
 
-Program looks for configuration file `cfg.yaml` in following places, and applies first one found:
+Program looks for configuration file `cfg.yaml` or `cfg.yml` in following places, and applies first one found:
 
-1. embed directory (for embedded configs)
-2. command line argument
-3. cfg.yaml in current directory
+1. command line argument
+2. embed directory (for embedded configs)
+3. current directory
+
+You can specify config file path from command line using `-c` flag, followed by config file path.
 
 In order to use embedded configuration, the program has to be precompiled with configuration applied, along with required ssh keys. Every embedded piece of configuration has to be placed in embed directory.
 
@@ -70,4 +72,3 @@ This tool is still under development. Some configuration methods may change.
 
 * [ ] Colored output based on host parameter status
 * [ ] Sorting
-* [ ] Specify config file as program argument
