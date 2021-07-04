@@ -80,24 +80,26 @@ func parseYAMLConfig() *YamlConfig {
 	// }
 	// paths = append(paths, []string{"./testdata/cfg.yaml", "./cfg.yaml"}...)
 
-	paths := []string{ConfigFile, "./cfg.yaml", "./testdata/cfg.yaml"}
+	paths := []string{ConfigFile, "./cfg.yaml", "./cfg.yml"}
 
 	var yamlFile []byte
 	var err error
 
 	if yamlFile, err = Embedded.ReadFile("embed/cfg.yaml"); err != nil {
-		for i := range paths {
-			yamlFile, err = os.ReadFile(paths[i])
-			if yamlFile != nil {
-				break
-			} else {
-				continue
+		if yamlFile, err = Embedded.ReadFile("embed/cfg.yml"); err != nil {
+			for i := range paths {
+				yamlFile, err = os.ReadFile(paths[i])
+				if yamlFile != nil {
+					break
+				} else {
+					continue
+				}
 			}
 		}
 	}
 
 	if yamlFile == nil {
-		log.Fatalln(err)
+		log.Fatalln("No configuration files found.")
 	}
 
 	var cfg YamlConfig
