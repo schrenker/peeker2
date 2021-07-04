@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"flag"
-	"fmt"
 
 	"github.com/schrenker/peeker2/config"
 	"github.com/schrenker/peeker2/host"
@@ -16,8 +15,6 @@ var embedded embed.FS
 func main() {
 	flag.StringVar(&config.ConfigFile, "c", "", "path to a config file")
 	flag.Parse()
-
-	fmt.Println(config.ConfigFile)
 
 	config.Embedded = embedded
 	host.Embedded = embedded
