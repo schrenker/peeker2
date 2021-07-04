@@ -10,6 +10,7 @@ import (
 )
 
 var Embedded embed.FS
+var ConfigFile string
 
 type GlobalConfig struct {
 	ServiceIndex Index
@@ -73,11 +74,13 @@ type YamlConfig struct {
 }
 
 func parseYAMLConfig() *YamlConfig {
-	paths := make([]string, 2, 3)
-	if len(os.Args) > 1 {
-		paths = append(paths, os.Args[1])
-	}
-	paths = append(paths, []string{"./testdata/cfg.yaml", "./cfg.yaml"}...)
+	// paths := make([]string, 2, 3)
+	// if len(os.Args) > 1 {
+	// 	paths = append(paths, os.Args[1])
+	// }
+	// paths = append(paths, []string{"./testdata/cfg.yaml", "./cfg.yaml"}...)
+
+	paths := []string{ConfigFile, "./cfg.yaml", "./testdata/cfg.yaml"}
 
 	var yamlFile []byte
 	var err error
