@@ -11,6 +11,7 @@ import (
 
 var Embedded embed.FS
 var ConfigFile string
+var GlobalCfg *GlobalConfig
 
 type GlobalConfig struct {
 	HostIndex    Index
@@ -111,13 +112,13 @@ func parseYAMLConfig() *YamlConfig {
 	return &cfg
 }
 
-func GetConfig() (*YamlConfig, *GlobalConfig) {
+func GenerateConfig() *YamlConfig {
 	yamlFile := parseYAMLConfig()
-	globalCfg := newGlobalConfig(
+	GlobalCfg = newGlobalConfig(
 		newIndex(*yamlFile, "host"),
 		newIndex(*yamlFile, "disk"),
 		newIndex(*yamlFile, "service"),
 		yamlFile.Interval,
 	)
-	return yamlFile, globalCfg
+	return yamlFile
 }
