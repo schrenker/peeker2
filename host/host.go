@@ -56,33 +56,33 @@ func (h *Host) initialState() {
 	}
 }
 
-func (h *Host) outToState(out []byte, disks, services config.Index) {
+func (h *Host) outToState(out []byte) {
 	tmp := strings.Split(string(out), "\n")
 	h.State["load"] = tmp[0]
 	field := 1
 
-	for i := range disks {
+	for i := range config.GlobalCfg.DiskIndex {
 		if tmp[field] != "" {
 			spl := strings.Split(tmp[field], " ")
 			atoi, _ := strconv.Atoi(spl[1][:len(spl[1])-1])
 			spl[1] = strconv.Itoa(100 - atoi)
-			h.State[disks[i]] = fmt.Sprintf("%v (%v%%)", spl[0], spl[1])
+			h.State[config.GlobalCfg.DiskIndex[i]] = fmt.Sprintf("%v (%v%%)", spl[0], spl[1])
 		} else {
-			h.State[disks[i]] = tmp[field]
+			h.State[config.GlobalCfg.DiskIndex[i]] = tmp[field]
 		}
 		field++
 	}
-	for i := range services {
-		h.State[services[i]] = tmp[field]
+	for i := range config.GlobalCfg.ServiceIndex {
+		h.State[config.GlobalCfg.ServiceIndex[i]] = tmp[field]
 		field++
 	}
 }
 
-func (h *Host) updateState(disks, services config.Index, wg *sync.WaitGroup) {
+func (h *Host) updateState(wg *sync.WaitGroup) {
 	defer wg.Done()
 	out, err := h.executeCmd()
 	if err != nil {
 		return
 	}
-	h.outToState(out, disks, services)
+	h.outToState(out)
 }

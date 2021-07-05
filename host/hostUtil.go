@@ -78,8 +78,8 @@ func stringInSlice(str string, slice []string) bool {
 	return false
 }
 
-func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host {
-	ret := make([]*Host, len(yamlFile.Hosts))
+func GetHosts(yamlFile config.YamlConfig) map[string]*Host {
+	ret := make(map[string]*Host, len(yamlFile.Hosts))
 
 	for i := range yamlFile.Hosts {
 		sshcfg, err := prepareSSHConfig(yamlFile.Hosts[i].User, yamlFile.Hosts[i].KeyPath)
@@ -87,7 +87,7 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 			log.Fatalln(err)
 		}
 
-		ret[i] = &Host{
+		ret[yamlFile.Hosts[i].Hostname] = &Host{
 			Hostname: yamlFile.Hosts[i].Hostname,
 			IP:       yamlFile.Hosts[i].Ip,
 			Port:     yamlFile.Hosts[i].Port,
@@ -96,24 +96,24 @@ func GetHosts(yamlFile config.YamlConfig, globalCfg config.GlobalConfig) []*Host
 			Cmd: commandBuilder(
 				yamlFile.Hosts[i].Disks,
 				yamlFile.Hosts[i].Services,
-				globalCfg.DiskIndex,
-				globalCfg.ServiceIndex,
+				config.GlobalCfg.DiskIndex,
+				config.GlobalCfg.ServiceIndex,
 			),
 			Cfg:   sshcfg,
 			State: make(map[string]string),
 		}
-		ret[i].initialState()
+		ret[yamlFile.Hosts[i].Hostname].initialState()
 	}
 
 	return ret
 }
 
-func UpdateStatusAll(hosts []*Host, disks, services config.Index) {
+func UpdateStatusAll(hosts map[string]*Host) {
 	var wg sync.WaitGroup
 
-	for i := range hosts {
+	for _, i := range config.GlobalCfg.HostIndex {
 		wg.Add(1)
-		go hosts[i].updateState(disks, services, &wg)
+		go hosts[i].updateState(&wg)
 	}
 
 	wg.Wait()
