@@ -13,13 +13,15 @@ var Embedded embed.FS
 var ConfigFile string
 
 type GlobalConfig struct {
+	HostIndex    Index
 	ServiceIndex Index
 	DiskIndex    Index
 	Interval     int
 }
 
-func newGlobalConfig(disk, srv Index, interval int) *GlobalConfig {
+func newGlobalConfig(host, disk, srv Index, interval int) *GlobalConfig {
 	return &GlobalConfig{
+		HostIndex:    host,
 		DiskIndex:    disk,
 		ServiceIndex: srv,
 		Interval:     interval,
@@ -42,6 +44,11 @@ func newIndex(hosts YamlConfig, indexType string) Index {
 			for j := range hosts.Hosts[i].Disks {
 				amounts[hosts.Hosts[i].Disks[j].Path]++
 			}
+		case "host":
+			for j := range hosts.Hosts {
+				ret = append(ret, hosts.Hosts[j].Hostname)
+			}
+			return ret
 		}
 	}
 
@@ -106,8 +113,11 @@ func parseYAMLConfig() *YamlConfig {
 
 func GetConfig() (*YamlConfig, *GlobalConfig) {
 	yamlFile := parseYAMLConfig()
-	disk := newIndex(*yamlFile, "disk")
-	srv := newIndex(*yamlFile, "service")
-	globalCfg := newGlobalConfig(disk, srv, yamlFile.Interval)
+	globalCfg := newGlobalConfig(
+		newIndex(*yamlFile, "host"),
+		newIndex(*yamlFile, "disk"),
+		newIndex(*yamlFile, "service"),
+		yamlFile.Interval,
+	)
 	return yamlFile, globalCfg
 }
