@@ -18,7 +18,7 @@ func main() {
 
 	config.Embedded = embedded
 	host.Embedded = embedded
-	yamlFile, globalCfg := config.GetConfig()
-	hosts := host.GetHosts(*yamlFile, *globalCfg)
-	view.Render(hosts, *globalCfg)
+	yamlFile := config.GenerateConfig()
+	hosts := host.GetHosts(*yamlFile)
+	view.Render(hosts)
 }
