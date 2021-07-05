@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	tm "github.com/buger/goterm"
+	"github.com/schrenker/peeker2/config"
 	"github.com/schrenker/peeker2/host"
 )
 
@@ -18,24 +19,15 @@ func (v view) display() {
 	tm.Flush()
 }
 
-func (v view) padding(hosts []*host.Host, banner []string) {
+func (v view) padding(hosts map[string]*host.Host) {
 	for i := range banner {
 		max := len(banner[i])
 
-		for j := range hosts {
+		for _, j := range config.GlobalCfg.HostIndex {
 			ln := len(hosts[j].State[banner[i]])
 			if ln > max {
 				max = ln
 			}
-			// if i == 0 {
-			// 	if len(hosts[j].Hostname) > max {
-			// 		max = len(hosts[j].Hostname)
-			// 	}
-			// } else {
-			// 	if len(hosts[j].State[banner[i]]) > max {
-			// 		max = len(hosts[j].State[banner[i]])
-			// 	}
-			// }
 		}
 
 		for k := range v {
@@ -44,22 +36,20 @@ func (v view) padding(hosts []*host.Host, banner []string) {
 	}
 }
 
-func newView(hosts []*host.Host, banner []string) view {
+func newView(hosts map[string]*host.Host) view {
 	ret := make(view, len(hosts)+1)
 
 	ret[0] = banner
+	ind := 1
 
-	for i := range hosts {
+	for _, i := range config.GlobalCfg.HostIndex {
 		tmp := make([]string, len(banner))
-		// tmp[0] = hosts[i].Hostname
-		// for j := 1; j < len(banner); j++ {
 		for j := range banner {
 			tmp[j] = hosts[i].State[banner[j]]
 		}
-		ret[i+1] = tmp
+		ret[ind] = tmp
+		ind++
 	}
 
 	return ret
 }
-
-// func colorize(row []string) {}

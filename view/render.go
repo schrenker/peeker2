@@ -7,6 +7,8 @@ import (
 	"github.com/schrenker/peeker2/host"
 )
 
+var banner []string
+
 func generateBanner(disks, services config.Index) []string {
 	banner := make([]string, 2+len(disks)+len(services))
 	banner[0] = "hostname"
@@ -23,13 +25,13 @@ func generateBanner(disks, services config.Index) []string {
 	return banner
 }
 
-func Render(hosts []*host.Host, globalCfg config.GlobalConfig) {
+func Render(hosts map[string]*host.Host) {
 	for {
-		host.UpdateStatusAll(hosts, globalCfg.DiskIndex, globalCfg.ServiceIndex)
-		banner := generateBanner(globalCfg.DiskIndex, globalCfg.ServiceIndex)
-		view := newView(hosts, banner)
-		view.padding(hosts, banner)
+		host.UpdateStatusAll(hosts)
+		banner = generateBanner(config.GlobalCfg.DiskIndex, config.GlobalCfg.ServiceIndex)
+		view := newView(hosts)
+		view.padding(hosts)
 		view.display()
-		time.Sleep(time.Duration(globalCfg.Interval) * time.Second)
+		time.Sleep(time.Duration(config.GlobalCfg.Interval) * time.Second)
 	}
 }
