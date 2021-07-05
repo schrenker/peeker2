@@ -20,11 +20,11 @@ func (v view) display() {
 }
 
 func (v view) padding(hosts map[string]*host.Host) {
-	for i := range banner {
-		max := len(banner[i])
+	for i := range v[0] {
+		max := len(v[0][i])
 
 		for _, j := range config.GlobalCfg.HostIndex {
-			ln := len(hosts[j].State[banner[i]])
+			ln := len(hosts[j].State[v[0][i]])
 			if ln > max {
 				max = ln
 			}
@@ -37,19 +37,20 @@ func (v view) padding(hosts map[string]*host.Host) {
 }
 
 func newView(hosts map[string]*host.Host) view {
-	ret := make(view, len(hosts)+1)
-
-	ret[0] = banner
-	ind := 1
+	v := make(view, len(hosts)+1)
+	v[0] = generateBanner()
+	iter := 1
 
 	for _, i := range config.GlobalCfg.HostIndex {
-		tmp := make([]string, len(banner))
-		for j := range banner {
-			tmp[j] = hosts[i].State[banner[j]]
+		tmp := make([]string, len(v[0]))
+		for j := range v[0] {
+			tmp[j] = hosts[i].State[v[0][j]]
 		}
-		ret[ind] = tmp
-		ind++
+		v[iter] = tmp
+		iter++
 	}
 
-	return ret
+	v.padding(hosts)
+
+	return v
 }

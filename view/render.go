@@ -7,19 +7,19 @@ import (
 	"github.com/schrenker/peeker2/host"
 )
 
-var banner []string
+// var banner []string
 
-func generateBanner(disks, services config.Index) []string {
-	banner := make([]string, 2+len(disks)+len(services))
+func generateBanner() []string {
+	banner := make([]string, 2+len(config.GlobalCfg.DiskIndex)+len(config.GlobalCfg.ServiceIndex))
 	banner[0] = "hostname"
 	banner[1] = "load"
 	field := 2
-	for i := 0; i < len(disks); i++ {
-		banner[field] = disks[i]
+	for i := 0; i < len(config.GlobalCfg.DiskIndex); i++ {
+		banner[field] = config.GlobalCfg.DiskIndex[i]
 		field++
 	}
-	for i := 0; i < len(services); i++ {
-		banner[field] = services[i]
+	for i := 0; i < len(config.GlobalCfg.ServiceIndex); i++ {
+		banner[field] = config.GlobalCfg.ServiceIndex[i]
 		field++
 	}
 	return banner
@@ -28,9 +28,7 @@ func generateBanner(disks, services config.Index) []string {
 func Render(hosts map[string]*host.Host) {
 	for {
 		host.UpdateStatusAll(hosts)
-		banner = generateBanner(config.GlobalCfg.DiskIndex, config.GlobalCfg.ServiceIndex)
 		view := newView(hosts)
-		view.padding(hosts)
 		view.display()
 		time.Sleep(time.Duration(config.GlobalCfg.Interval) * time.Second)
 	}
